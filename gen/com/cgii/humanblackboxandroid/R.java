@@ -25,8 +25,9 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080008;
+        public static final int action_settings=0x7f080009;
         public static final int container=0x7f080000;
+        public static final int debugTextView=0x7f080008;
         public static final int textView1=0x7f080001;
         public static final int textView2=0x7f080002;
         public static final int textView3=0x7f080003;
@@ -50,6 +51,7 @@ public final class R {
         public static final int last_time_max=0x7f050005;
         public static final int last_time_title=0x7f050003;
         public static final int last_time_video=0x7f050006;
+        public static final int placeholder=0x7f050007;
     }
     public static final class style {
         /** 

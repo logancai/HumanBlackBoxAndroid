@@ -8,5 +8,6 @@
     <string name="last_time_date">Date: </string>
     <string name="last_time_max">Max Acceleration: </string>
     <string name="last_time_video">Video</string>
+    <string name="placeholder">placeholder</string>
 
 </resources>
