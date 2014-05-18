@@ -1,3 +1,14 @@
+/*
+ * What needs to be done
+ * 
+ * [x]Get ACCELEROMETER
+ * [] Get other sensors
+ * [] Create background service
+ * [] Math of when the camera is invoked
+ * [] Create camera and store
+ * [] Code to draw the stuff on the screen of last invoked
+ */
+
 package com.cgii.humanblackboxandroid;
 
 import java.util.concurrent.TimeUnit;
@@ -47,6 +58,8 @@ public class MainActivity extends Activity implements SensorEventListener{
 		
 		//Register Listener
 		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+		
+		startService(Services.class);
 		
 		//Textview
 		textView = (TextView) findViewById(R.id.debugTextView);
