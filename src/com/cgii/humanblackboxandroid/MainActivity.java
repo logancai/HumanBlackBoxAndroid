@@ -3,7 +3,7 @@
  * 
  * [x]Get ACCELEROMETER
  * [] Get other sensors
- * [] Create background service
+ * [x] Create background service
  * [] Math of when the camera is invoked
  * [] Create camera and store
  * [] Code to draw the stuff on the screen of last invoked
@@ -11,15 +11,9 @@
 
 package com.cgii.humanblackboxandroid;
 
-import java.util.concurrent.TimeUnit;
-
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,21 +22,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements SensorEventListener{
-	
-	/** The refresh rate, in frames per second, of the compass. */
-    private static final int REFRESH_RATE_FPS = 45;
-	
-	/** The duration, in milliseconds, of one frame. */
-    private static final long FRAME_TIME_MILLIS = TimeUnit.SECONDS.toMillis(1) / REFRESH_RATE_FPS;
-	
-    /** Sensors*/
-    private SensorManager mSensorManager;
-    private Sensor mSensor;
+public class MainActivity extends Activity {
     
-    /** TextView*/
-    TextView textView;
-    
+	public static TextView textView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,16 +36,11 @@ public class MainActivity extends Activity implements SensorEventListener{
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
 		
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		
-		//Register Listener
-		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
-		
-		startService(Services.class);
-		
-		//Textview
 		textView = (TextView) findViewById(R.id.debugTextView);
+		
+		Intent intent = new Intent(this, Services.class);
+		startService(intent);
+		
 	}
 	
 	@Override
@@ -100,27 +78,6 @@ public class MainActivity extends Activity implements SensorEventListener{
 					false);
 			return rootView;
 		}
-	}
-	
-	/*
-	 * onSensorChanged and onAccuracyChanged are implemented from
-	 * SensorEventListener
-	 * 
-	 * (non-Javadoc)
-	 * @see android.hardware.SensorEventListener#onSensorChanged(android.hardware.SensorEvent)
-	 */
-	
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		textView = (TextView) findViewById(R.id.debugTextView);
-		textView.setText("X: " + event.values[0] + 
-				"\nY: " + event.values[1] + 
-				"\nZ: " + event.values[2]);
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		
 	}
 
 }
