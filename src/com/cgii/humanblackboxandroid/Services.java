@@ -9,7 +9,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
+import android.os.Environment;
 import android.os.IBinder;
+import android.text.format.Time;
 import android.widget.TextView;
 
 public class Services extends Service implements SensorEventListener{
@@ -26,6 +30,9 @@ public class Services extends Service implements SensorEventListener{
     
     /** TextView*/
     TextView textView;
+    
+    /** MediaRecorder*/
+    MediaRecorder recorder;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -58,6 +65,10 @@ public class Services extends Service implements SensorEventListener{
 		//Put your math calls or methods here...
 		//!!!!!
 		
+		if (event.values[0] > 8){
+			beginRecording();
+		}
+		
 		textView = MainActivity.textView;
 		textView.setText("X: " + event.values[0] + 
 				"\nY: " + event.values[1] + 
@@ -68,6 +79,26 @@ public class Services extends Service implements SensorEventListener{
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		
+	}
+	
+	/*
+	 * Camera stuff
+	 */
+	private void beginRecording(){
+		//Get time
+		Time today = new Time(Time.getCurrentTimezone());
+		today.setToNow();
+		String date = today.year + "_" + today.month+1 + "_" + today.monthDay + "_" + 
+				today.hour + ":" + today.minute + today.second;
+		String pathToSDCard = Environment.getExternalStorageState(); //Returns something like "/mnt/sdcard"
+		
+//		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+//	    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+//
+//	    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+//	    recorder.setProfile(cpHigh);
+//	    recorder.setOutputFile(pathToSDCard + "/DCIM/Camera/" + date + ".mp4");
+//	    recorder.setMaxDuration(15000); // 15 seconds
 	}
 	
 }
