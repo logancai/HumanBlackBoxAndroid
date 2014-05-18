@@ -88,7 +88,15 @@ public class MainActivity extends Activity implements SensorEventListener{
 			return rootView;
 		}
 	}
-
+	
+	/*
+	 * onSensorChanged and onAccuracyChanged are implemented from
+	 * SensorEventListener
+	 * 
+	 * (non-Javadoc)
+	 * @see android.hardware.SensorEventListener#onSensorChanged(android.hardware.SensorEvent)
+	 */
+	
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		textView = (TextView) findViewById(R.id.debugTextView);
