@@ -1,5 +1,6 @@
 package com.cgii.humanblackboxandroid;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import android.app.Service;
@@ -65,7 +66,7 @@ public class Services extends Service implements SensorEventListener{
 		//Put your math calls or methods here...
 		//!!!!!
 		
-		if (event.values[0] > 8){
+		if (vector > 20){
 			beginRecording();
 		}
 		
@@ -85,6 +86,8 @@ public class Services extends Service implements SensorEventListener{
 	 * Camera stuff
 	 */
 	private void beginRecording(){
+		recorder = new MediaRecorder();
+		
 		//Get time
 		Time today = new Time(Time.getCurrentTimezone());
 		today.setToNow();
@@ -92,13 +95,26 @@ public class Services extends Service implements SensorEventListener{
 				today.hour + ":" + today.minute + today.second;
 		String pathToSDCard = Environment.getExternalStorageState(); //Returns something like "/mnt/sdcard"
 		
-//		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-//	    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-//
-//	    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-//	    recorder.setProfile(cpHigh);
-//	    recorder.setOutputFile(pathToSDCard + "/DCIM/Camera/" + date + ".mp4");
-//	    recorder.setMaxDuration(15000); // 15 seconds
+		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+	    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+
+	    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+	    recorder.setProfile(cpHigh);
+	    recorder.setOutputFile(pathToSDCard + "/DCIM/Camera/" + date + ".mp4");
+	    recorder.setMaxDuration(15000); // 15 seconds
+	    
+	    try {
+			recorder.prepare();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+//	    recorder.start();
+	    
 	}
 	
 }
