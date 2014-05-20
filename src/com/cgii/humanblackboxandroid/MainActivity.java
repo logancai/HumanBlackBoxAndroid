@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -25,6 +27,10 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
     
 	public static TextView textView;
+	public static TextView countView;
+	
+	public static SurfaceView surfaceView;
+    public static SurfaceHolder surfaceHolder;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,7 @@ public class MainActivity extends Activity {
 		}
 		
 		textView = (TextView) findViewById(R.id.debugTextView);
+		countView = (TextView) findViewById(R.id.count);
 		
 		Intent intent = new Intent(this, Services.class);
 		startService(intent);

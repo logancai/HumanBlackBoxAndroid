@@ -1,6 +1,8 @@
 package com.cgii.humanblackboxandroid;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import android.app.Service;
@@ -17,6 +19,8 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.text.format.Time;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 
 public class Services extends Service implements SensorEventListener{
@@ -37,7 +41,13 @@ public class Services extends Service implements SensorEventListener{
     TextView textView;
     
     /** MediaRecorder*/
-    MediaRecorder recorder;
+    private MediaRecorder recorder;
+    private Date startTime;
+    private boolean isRecording = false;
+    private long recordingDuration = 15000; // 15 seconds
+    
+    private SurfaceView surfaceView;
+    private SurfaceHolder surfaceHolder;
     
     /** For math calculations*/
     private double X,Y,Z,mag;
@@ -45,7 +55,7 @@ public class Services extends Service implements SensorEventListener{
 	private double jerkx;
 	private double jerky;
 	private double jerkz;
-	private int count;
+	private int count = 0;
 	private double time;
 	private double now;
 	
@@ -54,6 +64,7 @@ public class Services extends Service implements SensorEventListener{
 		return null;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(){
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -61,8 +72,8 @@ public class Services extends Service implements SensorEventListener{
 		//Register Listener
 		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
 		
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) this);
+//		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) this);
 	}
 	
 	@Override
@@ -77,52 +88,61 @@ public class Services extends Service implements SensorEventListener{
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		float vector = (float) Math.sqrt(event.values[0]*event.values[0] 
-				+ event.values[1]*event.values[1] 
-				+ event.values[2]*event.values[2]);
-		
-		textView = MainActivity.textView;
-		textView.setText("X: " + event.values[0] + 
-				"\nY: " + event.values[1] + 
-				"\nZ: " + event.values[2] +
-				"\nVector: " + vector);
-		
-		count=1; 
-		/* Wont count always be 1 ? -Logan
-		 * When onSensorChanged get's called it is always going to set count = 1
-		*/
-		// Gives you your change in time from now to the last time 
-		Time late =new Time(Time.getCurrentTimezone());	
-		long latetime=late.toMillis(true);
-
-		if(count==1){ // for the first iteration when we dont have any now data 
-			time=latetime;
-			jerkx=X-X/time;
-			jerky=Y-Y/time;
-			jerkz=Z-Z/time;
-			jerk=0/time;
-			count++;
-		}
-		else{
-			 time=(latetime-now)/1000;
-			jerkx=(event.values[0]-X)/time;
-			jerky=(event.values[1]-Y)/time;
-			jerkz=(event.values[2]-Z)/time;
-			jerk=(vector-mag)/time;
-		}
-		now=latetime;// then set late to now
-
-		double g=9.8;
-		if (event.values[0] > 2*g|| event.values[1]>2*g||event.values[2]>2*g|| vector>2*g){
-			if(jerk<0||jerk>0){
-			beginRecording();
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+			float vector = (float) Math.sqrt(event.values[0]*event.values[0] 
+					+ event.values[1]*event.values[1] 
+					+ event.values[2]*event.values[2]);
+			
+			textView = MainActivity.textView;
+			textView.setText("X: " + event.values[0] + 
+					"\nY: " + event.values[1] + 
+					"\nZ: " + event.values[2] +
+					"\nVector: " + vector);
+			
+			if (vector > 15){
+				beginRecording();
 			}
+			
+//			count=1; 
+//			/* Wont count always be 1 ? -Logan
+//			 * When onSensorChanged get's called it is always going to set count = 1
+//			*/
+//			// Gives you your change in time from now to the last time 
+//			Time late =new Time(Time.getCurrentTimezone());	
+//			long latetime=late.toMillis(true);
+//
+//			if(count==1){ // for the first iteration when we dont have any now data 
+//				time=latetime;
+//				jerkx=X-X/time;
+//				jerky=Y-Y/time;
+//				jerkz=Z-Z/time;
+//				jerk=0/time;
+//				count++;
+//			}
+//			else{
+//				 time=(latetime-now)/1000;
+//				jerkx=(event.values[0]-X)/time;
+//				jerky=(event.values[1]-Y)/time;
+//				jerkz=(event.values[2]-Z)/time;
+//				jerk=(vector-mag)/time;
+//			}
+//			now=latetime;// then set late to now
+//
+//			double g=9.8;
+//			if (event.values[0] > 2*g|| event.values[1]>2*g||event.values[2]>2*g|| vector>2*g){
+//				if(jerk<0||jerk>0){
+//				beginRecording();
+//				}
+//			}
+//
+//			 X=event.values[0];
+//			 Y=event.values[1];
+//			 Z=event.values[2];
+//			 mag=(double)vector;
 		}
-
-		 X=event.values[0];
-		 Y=event.values[1];
-		 Z=event.values[2];
-		 mag=(double)vector;
+		
+		
+		
 	}
 
 	@Override
@@ -134,35 +154,63 @@ public class Services extends Service implements SensorEventListener{
 	 * Camera stuff
 	 */
 	private void beginRecording(){
-		recorder = new MediaRecorder();
 		
-		//Get time
-		Time today = new Time(Time.getCurrentTimezone());
-		today.setToNow();
-		String date = today.year + "_" + today.month+1 + "_" + today.monthDay + "_" + 
-				today.hour + ":" + today.minute + today.second;
-		String pathToSDCard = Environment.getExternalStorageState(); //Returns something like "/mnt/sdcard"
 		
-		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-	    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-
-	    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-	    recorder.setProfile(cpHigh);
-	    recorder.setOutputFile(pathToSDCard + "/DCIM/Camera/" + date + ".mp4");
-	    recorder.setMaxDuration(15000); // 15 seconds
-	    
-	    try {
-			recorder.prepare();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		//Check if is recording
+		if (isRecording == false){
+			isRecording = true;
+			startTime = new Date();
+			
+			//Just for debugging
+			count += 1;
+			textView = MainActivity.countView;
+			String num = Integer.toString(count);
+			textView.setText(num);
+			
+			//setup information about recording
+			Time today = new Time(Time.getCurrentTimezone());
+			today.setToNow();
+			String date = today.year + "_" + (today.month+1) + "_" + today.monthDay + "_" + 
+					today.hour + ":" + today.minute + ":" + today.second;
+			File path = Environment.getExternalStorageDirectory(); //Returns something like "/mnt/sdcard"
+			String pathToSDCard = path.toString();
+			String filePath = pathToSDCard + "/DCIM/Camera/" + date + ".mp4";
+			
+			//Setup MediaRecorder
+			recorder = new MediaRecorder();
+			recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+		    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+//		    recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+			recorder.setOutputFile(filePath);
+		    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+		    recorder.setProfile(cpHigh);
+//		    recorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
+		    recorder.setMaxDuration((int) recordingDuration);
+		    try {
+				recorder.prepare();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    recorder.start();
+//		    recorder.stop();
+//		    recorder.release();
 		}
-	    
-//	    recorder.start();
-	    
+		else{
+			Date now = new Date();
+			long difference = now.getTime() - startTime.getTime();
+			
+			//If the difference of time from (NOW-START) > DURATION
+			//reset is recording
+			if (difference > recordingDuration){
+				isRecording =false;
+				beginRecording();
+			}
+		}
+ 
 	}
 	
 }
