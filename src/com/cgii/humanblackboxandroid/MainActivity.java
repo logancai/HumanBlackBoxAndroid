@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
     
+	public static String TAG = "com.cgii.humanblackbox";
+	
 	public static TextView textView;
 	public static TextView countView;
 	

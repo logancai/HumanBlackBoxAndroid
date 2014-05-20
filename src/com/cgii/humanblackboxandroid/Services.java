@@ -1,24 +1,21 @@
 package com.cgii.humanblackboxandroid;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.os.Environment;
+import android.media.MediaRecorder.OnInfoListener;
 import android.os.IBinder;
-import android.text.format.Time;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
@@ -37,14 +34,14 @@ public class Services extends Service implements SensorEventListener{
     protected LocationManager locationManager;
     protected LocationListener locationListener;
     
-    /** TextView*/
-    TextView textView;
     
     /** MediaRecorder*/
-    private MediaRecorder recorder;
     private Date startTime;
     private boolean isRecording = false;
-    private long recordingDuration = 15000; // 15 seconds
+    private long recordingDuration = 17000; // 15 seconds
+    
+    /** TextView*/
+    TextView textView;
     
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
@@ -154,9 +151,6 @@ public class Services extends Service implements SensorEventListener{
 	 * Camera stuff
 	 */
 	private void beginRecording(){
-		
-		
-		//Check if is recording
 		if (isRecording == false){
 			isRecording = true;
 			startTime = new Date();
@@ -167,37 +161,7 @@ public class Services extends Service implements SensorEventListener{
 			String num = Integer.toString(count);
 			textView.setText(num);
 			
-			//setup information about recording
-			Time today = new Time(Time.getCurrentTimezone());
-			today.setToNow();
-			String date = today.year + "_" + (today.month+1) + "_" + today.monthDay + "_" + 
-					today.hour + ":" + today.minute + ":" + today.second;
-			File path = Environment.getExternalStorageDirectory(); //Returns something like "/mnt/sdcard"
-			String pathToSDCard = path.toString();
-			String filePath = pathToSDCard + "/DCIM/Camera/" + date + ".mp4";
-			
-			//Setup MediaRecorder
-			recorder = new MediaRecorder();
-			recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-		    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-//		    recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-			recorder.setOutputFile(filePath);
-		    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-		    recorder.setProfile(cpHigh);
-//		    recorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
-		    recorder.setMaxDuration((int) recordingDuration);
-		    try {
-				recorder.prepare();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		    recorder.start();
-//		    recorder.stop();
-//		    recorder.release();
+			CameraServices camerServices = new CameraServices();
 		}
 		else{
 			Date now = new Date();
@@ -210,7 +174,6 @@ public class Services extends Service implements SensorEventListener{
 				beginRecording();
 			}
 		}
- 
 	}
 	
 }
