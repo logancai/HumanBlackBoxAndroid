@@ -1,5 +1,6 @@
 package com.cgii.humanblackboxandroid;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -14,13 +15,21 @@ import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.VideoView;
 
-public class Services extends Service implements SensorEventListener{
+public class Services extends Service implements 
+							SensorEventListener, 
+							SurfaceHolder.Callback, 
+							OnInfoListener, 
+							OnErrorListener{
 
 	/** The refresh rate, in frames per second, of the compass. */
     private static final int REFRESH_RATE_FPS = 45;
@@ -38,13 +47,17 @@ public class Services extends Service implements SensorEventListener{
     /** MediaRecorder*/
     private Date startTime;
     private boolean isRecording = false;
-    private long recordingDuration = 17000; // 15 seconds
+    private long recordingDuration = 15000; // 15 seconds
+    
+    private Camera camera = null;
+    private MediaRecorder recorder = null;
     
     /** TextView*/
     TextView textView;
     
-    private SurfaceView surfaceView;
-    private SurfaceHolder surfaceHolder;
+    /** Video Views*/
+    private VideoView videoView = null;
+    private SurfaceHolder holder = null;
     
     /** For math calculations*/
     private double X,Y,Z,mag;
@@ -97,6 +110,7 @@ public class Services extends Service implements SensorEventListener{
 					"\nVector: " + vector);
 			
 			if (vector > 15){
+//				Toast.makeText(this, "Greater than 15", Toast.LENGTH_SHORT).show();
 				beginRecording();
 			}
 			
@@ -152,6 +166,7 @@ public class Services extends Service implements SensorEventListener{
 	 */
 	private void beginRecording(){
 		if (isRecording == false){
+			Toast.makeText(this, "beginrecording == false", Toast.LENGTH_SHORT).show();
 			isRecording = true;
 			startTime = new Date();
 			
@@ -161,9 +176,16 @@ public class Services extends Service implements SensorEventListener{
 			String num = Integer.toString(count);
 			textView.setText(num);
 			
-			CameraServices camerServices = new CameraServices();
+			//Begin Camera services
+			Log.v(MainActivity.TAG, "CameraServices created");
+			boolean cameraReady = initCamera();
+//			if (!initCamera()){
+////				finish();
+//				System.exit(-1);
+//			}
 		}
 		else{
+			Toast.makeText(this, "beginrecording == true", Toast.LENGTH_SHORT).show();
 			Date now = new Date();
 			long difference = now.getTime() - startTime.getTime();
 			
@@ -175,5 +197,102 @@ public class Services extends Service implements SensorEventListener{
 			}
 		}
 	}
+
+	private boolean initCamera() {
+		try{
+			camera = Camera.open();
+			Camera.Parameters camParams = camera.getParameters();
+			camera.lock();
+			holder = videoView.getHolder();
+			holder.addCallback(this);
+			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		}
+		catch(RuntimeException re){
+			Toast.makeText(this, "Camera could not initialize", Toast.LENGTH_SHORT).show();
+			Log.v(MainActivity.TAG, "Could not initialize the camera");
+			re.printStackTrace();
+			return false;
+		}
+		System.out.println(true);
+		Toast.makeText(this, "Camera initialized", Toast.LENGTH_SHORT).show();
+		return true;
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		Log.v(MainActivity.TAG, "surfaceCreated");
+		try{
+			camera.setPreviewDisplay(holder);
+			camera.startPreview();
+		}
+		catch (IOException e){
+			Log.v(MainActivity.TAG, "Could not start the preview");
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onInfo(MediaRecorder mr, int what, int extra) {
+		Log.i(MainActivity.TAG, "got a recording event");
+		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
+			Log.i(MainActivity.TAG, "max duration reached");
+			stopRecording();
+			
+		}
+	}
+	
+	private void stopRecording() {
+		if (recorder != null){
+			recorder.setOnErrorListener(null);
+			recorder.setOnInfoListener(null);
+			try{
+				recorder.stop();
+			}
+			catch(IllegalStateException e){
+				Log.e(MainActivity.TAG, "IllegalStateEcep in stopRecording");
+			}
+			releaseRecorder();
+			releaseCamera();
+		}
+	}
+	
+	private void releaseCamera(){
+		if (camera != null){
+			try{
+				camera.reconnect();
+			}
+			catch (IOException e){
+				e.printStackTrace();
+			}
+			camera.release();
+			camera = null;
+		}
+	}
+	private void  releaseRecorder(){
+		if(recorder != null){
+			recorder.release();
+			recorder = null;
+		}
+	}
+
+	@Override
+	public void onError(MediaRecorder mr, int what, int extra) {
+		Log.e(MainActivity.TAG, "got a recording error");
+		stopRecording();
+	}
+	
 	
 }

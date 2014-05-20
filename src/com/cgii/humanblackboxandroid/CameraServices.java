@@ -1,6 +1,9 @@
 package com.cgii.humanblackboxandroid;
 
+//https://www.youtube.com/watch?v=ZScE1aXS1Rs
+
 import java.io.File;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.hardware.Camera;
@@ -13,6 +16,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 public class CameraServices extends Activity implements OnInfoListener, SurfaceHolder.Callback, OnErrorListener{
@@ -24,19 +28,52 @@ public class CameraServices extends Activity implements OnInfoListener, SurfaceH
 	
 	/** MediaRecorder*/
     private MediaRecorder recorder = null;
-    private long recordingDuration = 17000; // 15 seconds
+    private long recordingDuration = 15000; // 15 seconds
     private Camera camera = null;
     
     int count = 0;
 	
 	public CameraServices (){
-		
+		//Do nothing
+	}
+	
+	public void launchCameraService(){
+//		Toast.makeText(this, "Launched Camera", Toast.LENGTH_SHORT).show();
+		Log.v(MainActivity.TAG, "CameraServices created");
 		if (!initCamera()){
 			finish();
 		}
-		initRecorder();
 		
+//		videoView = (VideoView) findViewById(R.id.videoView1);
 		
+//		initRecorder();
+//		beginRecording();
+	}
+	
+	private void beginRecording() {
+		recorder.setOnInfoListener(this);
+		recorder.setOnErrorListener(this);
+		recorder.start();
+		
+	}
+
+	private void releaseCamera(){
+		if (camera != null){
+			try{
+				camera.reconnect();
+			}
+			catch (IOException e){
+				e.printStackTrace();
+			}
+			camera.release();
+			camera = null;
+		}
+	}
+	private void  releaseRecorder(){
+		if(recorder != null){
+			recorder.release();
+			recorder = null;
+		}
 	}
 	
 	private void initRecorder() {
@@ -76,28 +113,6 @@ public class CameraServices extends Activity implements OnInfoListener, SurfaceH
 			Log.v(MainActivity.TAG, "MediaRecorder failed to initialize");
 			e.printStackTrace();
 		}
-		
-		//Setup MediaRecorder
-//		recorder = new MediaRecorder();
-//		
-//		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-//	    recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-////								    recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-//		recorder.setOutputFile(filePath);
-//	    CamcorderProfile cpHigh = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-//	    recorder.setProfile(cpHigh);
-////								    recorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
-//	    recorder.setMaxDuration((int) recordingDuration);
-//	    try {
-//			recorder.prepare();
-//		} catch (IllegalStateException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	    recorder.start();
 	}
 
 	private boolean initCamera(){
@@ -110,30 +125,58 @@ public class CameraServices extends Activity implements OnInfoListener, SurfaceH
 			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 		catch(RuntimeException re){
+			Toast.makeText(this, "Camera could not initialize", Toast.LENGTH_SHORT).show();
 			Log.v(MainActivity.TAG, "Could not initialize the camera");
 			re.printStackTrace();
 			return false;
 		}
+		System.out.println(true);
+		Toast.makeText(this, "Camera initialized", Toast.LENGTH_SHORT).show();
 		return true;
 	}
 
 	@Override
 	public void onInfo(MediaRecorder mr, int what, int extra) {
+		Log.i(MainActivity.TAG, "got a recording event");
 		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
-			recorder.stop();
+			Log.i(MainActivity.TAG, "max duration reached");
+			stopRecording();
+			
+		}
+	}
+
+	private void stopRecording() {
+		if (recorder != null){
+			recorder.setOnErrorListener(null);
+			recorder.setOnInfoListener(null);
+			try{
+				recorder.stop();
+			}
+			catch(IllegalStateException e){
+				Log.e(MainActivity.TAG, "IllegalStateEcep in stopRecording");
+			}
+			releaseRecorder();
+			releaseCamera();
 		}
 	}
 
 	@Override
 	public void onError(MediaRecorder mr, int what, int extra) {
-		// TODO Auto-generated method stub
-		
+		Log.e(MainActivity.TAG, "got a recording error");
+		stopRecording();
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
+		Log.v(MainActivity.TAG, "surfaceCreated");
+		try{
+			camera.setPreviewDisplay(holder);
+			camera.startPreview();
+		}
+		catch (IOException e){
+			Log.v(MainActivity.TAG, "Could not start the preview");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
