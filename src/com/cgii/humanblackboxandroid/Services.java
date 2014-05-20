@@ -10,6 +10,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -28,12 +30,24 @@ public class Services extends Service implements SensorEventListener{
 	/** Sensors*/
     private SensorManager mSensorManager;
     private Sensor mSensor;
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
     
     /** TextView*/
     TextView textView;
     
     /** MediaRecorder*/
     MediaRecorder recorder;
+    
+    /** For math calculations*/
+    private double X,Y,Z,mag;
+	private double jerk;
+	private double jerkx;
+	private double jerky;
+	private double jerkz;
+	private int count;
+	private double time;
+	private double now;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -46,6 +60,9 @@ public class Services extends Service implements SensorEventListener{
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		//Register Listener
 		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+		
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) this);
 	}
 	
 	@Override
@@ -60,21 +77,52 @@ public class Services extends Service implements SensorEventListener{
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		float vector = (float) Math.sqrt(event.values[0]*event.values[0] + event.values[1]*event.values[1] + event.values[2]*event.values[2]);
-		
-		//!!!!!!!!
-		//Put your math calls or methods here...
-		//!!!!!
-		
-		if (vector > 20){
-			beginRecording();
-		}
+		float vector = (float) Math.sqrt(event.values[0]*event.values[0] 
+				+ event.values[1]*event.values[1] 
+				+ event.values[2]*event.values[2]);
 		
 		textView = MainActivity.textView;
 		textView.setText("X: " + event.values[0] + 
 				"\nY: " + event.values[1] + 
 				"\nZ: " + event.values[2] +
 				"\nVector: " + vector);
+		
+		count=1; 
+		/* Wont count always be 1 ? -Logan
+		 * When onSensorChanged get's called it is always going to set count = 1
+		*/
+		// Gives you your change in time from now to the last time 
+		Time late =new Time(Time.getCurrentTimezone());	
+		long latetime=late.toMillis(true);
+
+		if(count==1){ // for the first iteration when we dont have any now data 
+			time=latetime;
+			jerkx=X-X/time;
+			jerky=Y-Y/time;
+			jerkz=Z-Z/time;
+			jerk=0/time;
+			count++;
+		}
+		else{
+			 time=(latetime-now)/1000;
+			jerkx=(event.values[0]-X)/time;
+			jerky=(event.values[1]-Y)/time;
+			jerkz=(event.values[2]-Z)/time;
+			jerk=(vector-mag)/time;
+		}
+		now=latetime;// then set late to now
+
+		double g=9.8;
+		if (event.values[0] > 2*g|| event.values[1]>2*g||event.values[2]>2*g|| vector>2*g){
+			if(jerk<0||jerk>0){
+			beginRecording();
+			}
+		}
+
+		 X=event.values[0];
+		 Y=event.values[1];
+		 Z=event.values[2];
+		 mag=(double)vector;
 	}
 
 	@Override
