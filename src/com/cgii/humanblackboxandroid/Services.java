@@ -193,7 +193,9 @@ public class Services extends Service implements
 
 	@Override
 	public void onInfo(MediaRecorder mr, int what, int extra) {
+		//This never gets called for some odd reason...
 		Log.i(MainActivity.TAG, "got a recording event");
+		Toast.makeText(this, "onInfo called", Toast.LENGTH_SHORT).show();
 		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
 			Log.i(MainActivity.TAG, "max duration reached");
 			Toast.makeText(this, "max duration reached", Toast.LENGTH_SHORT).show();
@@ -237,15 +239,11 @@ public class Services extends Service implements
 	}
 	
 	private void initRecorder() {
-//		if (recorder != null) {
-//			return;
-//		}
-		
 		//setup information about recording
 		Time today = new Time(Time.getCurrentTimezone());
 		today.setToNow();
 		String date = today.year + "_" + (today.month+1) + "_" + today.monthDay + "_" + 
-				today.hour + ":" + today.minute + ":" + today.second;
+				today.hour + "h" + today.minute + "m" + today.second + "s";
 		File path = Environment.getExternalStorageDirectory(); //Returns something like "/mnt/sdcard"
 		String pathToSDCard = path.toString();
 		String filePath = pathToSDCard + "/DCIM/Camera/" + date + ".mp4";
@@ -258,27 +256,45 @@ public class Services extends Service implements
 			MainActivity.recorder.setCamera(MainActivity.camera);
 			
 			MainActivity.recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-			MainActivity.recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+			MainActivity.recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 			MainActivity.recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-//			MainActivity.recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-//			CamcorderProfile cam = new CamcorderProfile();
-//			MainActivity.recorder.setProfile();
+//			MainActivity.recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P)); //does not work
+			MainActivity.recorder.setVideoSize(1920, 1080);
 			MainActivity.recorder.setVideoFrameRate(30); //we could change that later
 			MainActivity.recorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
 			MainActivity.recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-			MainActivity.recorder.setMaxDuration((int)recordingDuration);
+			int time = (int) recordingDuration;
+			MainActivity.recorder.setMaxDuration(time);
 			MainActivity.recorder.setPreviewDisplay(MainActivity.holder.getSurface());
 			MainActivity.recorder.setOutputFile(filePath);
 			
 			MainActivity.recorder.prepare();
+			
 			Log.v(MainActivity.TAG, "MediaRecorder initialized");
 			
 			MainActivity.recorder.start();
+			Toast.makeText(this, "Began recording", Toast.LENGTH_SHORT).show();
+			long difference;
+			do{
+				Date now = new Date();
+				difference = now.getTime() - startTime.getTime();
+			}while(difference < recordingDuration);
 		}
 		catch(Exception e){
 			Log.v(MainActivity.TAG, "MediaRecorder failed to initialize");
 			e.printStackTrace();
 		}
+		
+		try{
+			MainActivity.recorder.stop();
+		}
+		catch(IllegalStateException e){
+			Log.e(MainActivity.TAG, "IllegalStateEcep in stopRecording");
+		}
+		
+//		MainActivity.recorder.stop();
+//		stopRecording();
+		
 	}
 
 	@Override

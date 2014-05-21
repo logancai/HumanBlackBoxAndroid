@@ -127,10 +127,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	}
 	
 	@SuppressWarnings("deprecation")
-	private boolean initCamera() {
+	boolean initCamera() {
 		try{
 			camera = Camera.open();
 			Camera.Parameters camParams = camera.getParameters();
+			/* Fix for Samsung Phones*/
+			camParams.set("cam_mode", 1);
+			camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
+			camera.setParameters(camParams);
+			
 			camera.lock();
 			holder = videoView.getHolder();
 			holder.addCallback(this);
