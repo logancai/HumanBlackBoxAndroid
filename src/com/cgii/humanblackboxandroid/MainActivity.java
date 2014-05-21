@@ -45,8 +45,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	
 	public static SurfaceHolder holder = null;
     public static SurfaceView surfaceView = null;
-//    public static VideoView videoView = null;
-    public static SurfaceView videoView = null;
+    public static VideoView videoView = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +59,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 		
 		textView = (TextView) findViewById(R.id.debugTextView);
 		countView = (TextView) findViewById(R.id.count);
-//		videoView = (TextView) findViewById(R.id.videoView1);
-		videoView = (SurfaceView) findViewById(R.id.videoView2);
+		videoView = (VideoView) findViewById(R.id.videoView1);
 		
 		//Begin Camera services
 		Log.v(MainActivity.TAG, "CameraServices created");
@@ -88,9 +86,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		
-//		releaseCamera();
-//		releaseRecorder();
+		releaseCamera();
 	}
 	
 	@Override
@@ -141,7 +137,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 			camera.setParameters(camParams);
 			
 			camera.lock();
-//			holder = videoView.getHolder();
 			holder = videoView.getHolder();
 			holder.addCallback(this);
 			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -169,12 +164,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 			camera = null;
 		}
 	}
-	private void  releaseRecorder(){
-		if(MainActivity.recorder != null){
-			MainActivity.recorder.release();
-			MainActivity.recorder = null;
-		}
-	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
@@ -192,23 +181,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		//Do nothing
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		//Do nothing
+		// TODO Auto-generated method stub
+		
 	}
-	
-	public void stopServices(View view){
-		Intent intent = new Intent(this, Services.class);
-		stopService(intent);
-		Toast.makeText(this, "Services stopped", Toast.LENGTH_SHORT).show();
-	}
-	public void restartServices(View view){
-		Intent intent = new Intent(this, Services.class);
-		stopService(intent);
-		startService(intent);
-		Toast.makeText(this, "Services restarted", Toast.LENGTH_SHORT).show();
-	}
+
 }

@@ -9,9 +9,5 @@
     <string name="last_time_max">Max Acceleration: </string>
     <string name="last_time_video">Video</string>
     <string name="placeholder">placeholder</string>
-    <string name="info_about_app">HumanBlackBox automatically launches a background service and calls on the accelerometer. If a dangerous acceleration is measured we will automatically record a video. \nNote: This program will not automatically launch at start. Please reopen this application if you restart you device. Press the button below if you wish to stop the background service.</string>
-    <string name="about">About HumanBlackBox</string>
-    <string name="stop_services">Stop Background Services</string>
-    <string name="restart_services">Restart Services</string>
 
 </resources>

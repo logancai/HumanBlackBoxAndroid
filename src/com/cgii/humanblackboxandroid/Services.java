@@ -8,13 +8,14 @@ import java.util.concurrent.TimeUnit;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Camera.Size;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
@@ -23,8 +24,10 @@ import android.os.IBinder;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 public class Services extends Service implements 
 							SensorEventListener,
@@ -82,12 +85,6 @@ public class Services extends Service implements
 	}
 	
 	@Override
-	public void onDestroy(){
-		mSensorManager = null;
-		mSensor = null;
-	}
-	
-	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		System.out.print("onStartCommand called");
 		return START_STICKY;
@@ -110,7 +107,8 @@ public class Services extends Service implements
 					"\nZ: " + event.values[2] +
 					"\nVector: " + vector);
 			
-			if (vector > 20){
+			if (vector > 15){
+//				Toast.makeText(this, "Greater than 15", Toast.LENGTH_SHORT).show();
 				beginRecording();
 			}
 			
@@ -166,6 +164,7 @@ public class Services extends Service implements
 	 */
 	private void beginRecording(){
 		if (isRecording == false){
+			Toast.makeText(this, "beginrecording == false", Toast.LENGTH_SHORT).show();
 			isRecording = true;
 			startTime = new Date();
 			
@@ -196,9 +195,10 @@ public class Services extends Service implements
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 		//This never gets called for some odd reason...
 		Log.i(MainActivity.TAG, "got a recording event");
+		Toast.makeText(this, "onInfo called", Toast.LENGTH_SHORT).show();
 		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
 			Log.i(MainActivity.TAG, "max duration reached");
-			Toast.makeText(this, "Max duration reached", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "max duration reached", Toast.LENGTH_SHORT).show();
 			stopRecording();
 			
 		}
@@ -259,8 +259,6 @@ public class Services extends Service implements
 			MainActivity.recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 			MainActivity.recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 //			MainActivity.recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P)); //does not work
-//			Size size = MainActivity.camera.getParameters().getPreferredPreviewSizeForVideo();
-//			MainActivity.recorder.setVideoSize(size.height, size.width);
 			MainActivity.recorder.setVideoSize(1920, 1080);
 			MainActivity.recorder.setVideoFrameRate(30); //we could change that later
 			MainActivity.recorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);
@@ -274,10 +272,8 @@ public class Services extends Service implements
 			
 			Log.v(MainActivity.TAG, "MediaRecorder initialized");
 			
-			Toast.makeText(this, "Began recording", Toast.LENGTH_SHORT).show();
-			
 			MainActivity.recorder.start();
-			
+			Toast.makeText(this, "Began recording", Toast.LENGTH_SHORT).show();
 			long difference;
 			do{
 				Date now = new Date();
@@ -294,8 +290,11 @@ public class Services extends Service implements
 		}
 		catch(IllegalStateException e){
 			Log.e(MainActivity.TAG, "IllegalStateEcep in stopRecording");
-			stopRecording();
-		}		
+		}
+		
+//		MainActivity.recorder.stop();
+//		stopRecording();
+		
 	}
 
 	@Override
