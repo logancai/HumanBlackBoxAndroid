@@ -45,7 +45,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	
 	public static SurfaceHolder holder = null;
     public static SurfaceView surfaceView = null;
-    public static VideoView videoView = null;
+//    public static VideoView videoView = null;
+    public static SurfaceView videoView = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 		
 		textView = (TextView) findViewById(R.id.debugTextView);
 		countView = (TextView) findViewById(R.id.count);
-		videoView = (VideoView) findViewById(R.id.videoView1);
+//		videoView = (TextView) findViewById(R.id.videoView1);
+		videoView = (SurfaceView) findViewById(R.id.videoView2);
 		
 		//Begin Camera services
 		Log.v(MainActivity.TAG, "CameraServices created");
@@ -139,6 +141,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 			camera.setParameters(camParams);
 			
 			camera.lock();
+//			holder = videoView.getHolder();
 			holder = videoView.getHolder();
 			holder.addCallback(this);
 			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
