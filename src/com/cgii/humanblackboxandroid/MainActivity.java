@@ -86,7 +86,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		releaseCamera();
+		
+//		releaseCamera();
+//		releaseRecorder();
 	}
 	
 	@Override
@@ -164,6 +166,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 			camera = null;
 		}
 	}
+	private void  releaseRecorder(){
+		if(MainActivity.recorder != null){
+			MainActivity.recorder.release();
+			MainActivity.recorder = null;
+		}
+	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
@@ -181,14 +189,23 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		// TODO Auto-generated method stub
-		
+		//Do nothing
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
+		//Do nothing
 	}
-
+	
+	public void stopServices(View view){
+		Intent intent = new Intent(this, Services.class);
+		stopService(intent);
+		Toast.makeText(this, "Services stopped", Toast.LENGTH_SHORT).show();
+	}
+	public void restartServices(View view){
+		Intent intent = new Intent(this, Services.class);
+		stopService(intent);
+		startService(intent);
+		Toast.makeText(this, "Services restarted", Toast.LENGTH_SHORT).show();
+	}
 }
