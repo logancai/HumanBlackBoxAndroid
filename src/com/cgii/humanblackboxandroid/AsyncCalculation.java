@@ -31,7 +31,8 @@ public class AsyncCalculation extends Thread{
 //						Log.v(TAG, values);
 						
 						//Math formula goes here
-						//Please call beginRecording(); when ready to record
+						//Please call beginRecording(); and MainActivity.setRecodringStatus(true);
+						//when ready to record
 						SensorEvent event = MainActivity.getSensorEvent();
 						double vector = Math.sqrt(event.values[0]*event.values[0]+
 								event.values[1]*event.values[1]+
