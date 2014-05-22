@@ -13,12 +13,10 @@ public class SensorServices implements SensorEventListener{
 	private final SensorManager mSensorManager;
 	
 	public static boolean mTracking;
-	private boolean isRecording;
 	
 	public SensorServices(SensorManager sensorManager) {
 		mSensorManager = sensorManager;
 		mTracking = false;
-		isRecording = false;
 	}
 
 	@Override

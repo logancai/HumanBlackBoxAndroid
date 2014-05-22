@@ -12,43 +12,45 @@ public class AsyncCalculation extends Thread{
 	
 	public static String TAG = "com.cgii.humanblackbox";
 	
-	private boolean isRecording;
+//	private boolean isRecording;
 	
 	//Warning: you cannot edit the view. Only the original thread that created a view can touch its view.
 	
 	@Override
 	public void run(){
-		isRecording = false;
+		MainActivity.setRecodringStatus(false);
 		try{
 			Date before;
 			Date now;
 			while(SensorServices.getTracking() == true){
-				before = new Date();
-				now = new Date();
-				if (MainActivity.getSensorEvent() != null){
-//					String values = "Sensor is not null";
-//					Log.v(TAG, values);
-					
-					//Math formula goes here
-					SensorEvent event = MainActivity.getSensorEvent();
-					double vector = Math.sqrt(event.values[0]*event.values[0]+
-							event.values[1]*event.values[1]+
-							event.values[2]*event.values[2]);
-					
-					if (vector > 20){
-						isRecording = true;
+				if(MainActivity.getRecodringStatus() == false){
+					before = new Date();
+					now = new Date();
+					if (MainActivity.getSensorEvent() != null){
+//						String values = "Sensor is not null";
+//						Log.v(TAG, values);
+						
+						//Math formula goes here
+						//Please call beginRecording(); when ready to record
+						SensorEvent event = MainActivity.getSensorEvent();
+						double vector = Math.sqrt(event.values[0]*event.values[0]+
+								event.values[1]*event.values[1]+
+								event.values[2]*event.values[2]);
+						
+						if (vector > 20){
+							MainActivity.setRecodringStatus(true);
+							beginRecording();
+						}
 						beginRecording();
 					}
-					
+					else{
+						String values = "Sensor is null";
+						Log.v(TAG, values);
+					}
+					while((now.getTime() - before.getTime()) < MainActivity.getDelay()){
+						now = new Date();
+					}
 				}
-				else{
-					String values = "Sensor is null";
-					Log.v(TAG, values);
-				}
-				while((now.getTime() - before.getTime()) < MainActivity.getDelay()){
-					now = new Date();
-				}
-				
 			}
 		}
 		catch (NullPointerException e){
@@ -64,7 +66,8 @@ public class AsyncCalculation extends Thread{
 	private void beginRecording() {
 		Message msgObj = MainActivity.getHandler().obtainMessage();
 		Bundle b = new Bundle();
-		b.putBoolean("RECORDING", isRecording);
+		b.putBoolean("RECORDING", MainActivity.getRecodringStatus());
+		b.putBoolean("UPDATE", true);
 		msgObj.setData(b);
 		MainActivity.getHandler().sendMessage(msgObj);
     }

@@ -1,13 +1,13 @@
 package com.cgii.humanblackboxandroid;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.format.Time;
 import android.view.View;
+
+import com.cgii.humanblackboxandroid.MainActivity.PlaceholderFragment;
 
 //https://www.youtube.com/watch?v=ZScE1aXS1Rs
 
@@ -20,8 +20,9 @@ public class CameraServices extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.recordingview);
 		
+//		setContentView(R.layout.recordingview);
+		MainActivity.setRecodringStatus(false);
 	}
 	
 	public CameraServices(){
@@ -30,6 +31,7 @@ public class CameraServices extends Activity {
 	
 	protected void OnActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == TAKE_VIDEO_REQUEST && resultCode == RESULT_OK) {
+			MainActivity.setRecodringStatus(false);
 	        //The following line is for Google Glass only
 			/*
 			String picturePath = data.getStringExtra(
@@ -65,8 +67,8 @@ public class CameraServices extends Activity {
 //		values.put(MediaStore.Video.Media.TITLE, fileName);
 //		cameraVideoURI = getContentResolver().insert(
 //				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
-		intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, recordingDuration);
-		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+//		intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, recordingDuration);
+//		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 //		intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraVideoURI);
 		startActivityForResult(intent, TAKE_VIDEO_REQUEST);
 	}

@@ -68,20 +68,12 @@
             android:text="@string/placeholder"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView
-            android:id="@+id/count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/debugTextView"
-            android:layout_below="@+id/debugTextView"
-            android:text="@string/placeholder" />
-
         <Button
             android:id="@+id/forceCamera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/count"
             android:layout_alignParentLeft="true"
+            android:layout_below="@+id/debugTextView"
             android:onClick="launchCamera"
             android:text="Force Camera" />
 

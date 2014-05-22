@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
 	public static CameraServices mCameraServices;
 	public static Thread mAsyncCalculation;
 	public static Handler mHandler;
+	private static boolean isRecording;
 	
 	public final static int recordingTimeInSeconds = 15;
 	public final static long recordingTimeInMilSec = recordingTimeInSeconds * 1000;
@@ -58,7 +59,6 @@ public class MainActivity extends Activity {
 		}
 		
 		textView = (TextView) findViewById(R.id.debugTextView);
-		countView = (TextView) findViewById(R.id.count);
 		
 		//Begin Camera services
 		Log.v(MainActivity.TAG, "Main onCreate Called");
@@ -66,8 +66,12 @@ public class MainActivity extends Activity {
 		mHandler = new Handler(){
 			public void handleMessage(Message msg){
 				boolean isRecording = msg.getData().getBoolean("RECORDING");
+				boolean requestUpdate = msg.getData().getBoolean("UPDATE");
 				if(isRecording){
 					calledCamera();
+				}
+				if (requestUpdate){
+					debugSensorSetText();
 				}
 			}
 		};
@@ -178,6 +182,18 @@ public class MainActivity extends Activity {
 	public static Handler getHandler(){
 		return mHandler;
 	}
+	public static boolean getRecodringStatus(){
+		return isRecording;
+	}
+	public static boolean setRecodringStatus(boolean a){
+		isRecording = a;
+		return isRecording;
+	}
+	public static void debugSensorSetText(){
+		MainActivity.textView.setText("X: "+ mSensorEvent.values[0] +
+				"\nY: "+ mSensorEvent.values[1] +
+				"\nZ: "+ mSensorEvent.values[2]);
+	}
 	public void calledCamera(){
 		try{
 			Intent intent = new Intent(this, CameraServices.class);
@@ -185,7 +201,7 @@ public class MainActivity extends Activity {
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			Log.e(TAG, "An intent exception has occured.");
+			Log.e(TAG, "An exception has occured.");
 		}
 	}
 	

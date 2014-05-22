@@ -27,6 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.cgii.humanblackboxandroid.CameraServices"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name">
+        </activity>
         <service
             android:name=".Services"
             android:label="Services">
