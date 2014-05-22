@@ -11,41 +11,36 @@
 
 package com.cgii.humanblackboxandroid;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.hardware.Camera;
-import android.media.MediaRecorder;
+import android.hardware.SensorEvent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
-public class MainActivity extends Activity implements SurfaceHolder.Callback{
+public class MainActivity extends Activity {
     
 	public static String TAG = "com.cgii.humanblackbox";
 	
-	/** MediaRecorder Stuff*/
-	public static Camera camera = null;
-	public static MediaRecorder recorder = null;
+	public static SensorServices mSensorServices;
+	public static SensorEvent mSensorEvent;
+	public static CameraServices mCameraServices;
+	
+	public final static int recordingTimeInSeconds = 15;
+	public final static long recordingTimeInMilSec = recordingTimeInSeconds * 1000;
+	public final static long REFRESH_RATE_FPS = 45;
+	public final static long DELAY = 5; //in milliseconds
 	
     /** Layout stuff*/
     public static TextView textView = null;
 	public static TextView countView = null;
-	
-	public static SurfaceHolder holder = null;
-    public static SurfaceView surfaceView = null;
-    public static VideoView videoView = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,23 +54,30 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 		
 		textView = (TextView) findViewById(R.id.debugTextView);
 		countView = (TextView) findViewById(R.id.count);
-		videoView = (VideoView) findViewById(R.id.videoView1);
 		
 		//Begin Camera services
-		Log.v(MainActivity.TAG, "CameraServices created");
+		Log.v(MainActivity.TAG, "Main onCreate Called");
 		
 		Intent intent = new Intent(this, Services.class);
 		startService(intent);
 		
+		mCameraServices = new CameraServices();
 	}
 	
 	@Override
 	protected void onStart(){
 		super.onStart();
-		Log.v(MainActivity.TAG, "onResume");
-		if (!initCamera()){
-			finish();
+		Log.v(MainActivity.TAG, "Main onStart Called");
+		if (!(mSensorServices == null)){
+			mSensorServices.start();
 		}
+	}
+	
+	@Override
+	protected void onPause(){
+		super.onPause();
+		Log.v(MainActivity.TAG, "Main onStop Called");
+//		mSensorServices.stop(); //Need to remove later
 	}
 	
 	@Override
@@ -86,7 +88,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		releaseCamera();
 	}
 	
 	@Override
@@ -126,69 +127,28 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback{
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	boolean initCamera() {
-		try{
-			camera = Camera.open();
-			Camera.Parameters camParams = camera.getParameters();
-			/* Fix for Samsung Phones*/
-			camParams.set("cam_mode", 1);
-			camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_INFINITY);
-			camera.setParameters(camParams);
-			
-			camera.lock();
-			holder = videoView.getHolder();
-			holder.addCallback(this);
-			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		}
-		catch(RuntimeException re){
-			Toast.makeText(this, "Camera could not initialize", Toast.LENGTH_SHORT).show();
-			Log.v(MainActivity.TAG, "Could not initialize the camera");
-			re.printStackTrace();
-			return false;
-		}
-		System.out.println(true);
-		Toast.makeText(this, "Camera initialized", Toast.LENGTH_SHORT).show();
-		return true;
+	public void stopServices(View view){
+		mSensorServices.stop();
 	}
-	
-	private void releaseCamera(){
-		if (camera != null){
-			try{
-				camera.reconnect();
-			}
-			catch (IOException e){
-				e.printStackTrace();
-			}
-			camera.release();
-			camera = null;
-		}
+	public void restartServices(View view){
+		mSensorServices.stop();
+		mSensorServices.start();
 	}
-
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		Log.v(MainActivity.TAG, "surfaceCreated");
-		try{
-			camera.setPreviewDisplay(holder);
-			camera.startPreview();
-		}
-		catch (IOException e){
-			Log.v(MainActivity.TAG, "Could not start the preview");
-			e.printStackTrace();
-		}
+	public void launchCamera(View view){
+		Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+		intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, recordingTimeInSeconds);
+		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+		startActivityForResult(intent, CameraServices.TAKE_VIDEO_REQUEST);
 	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
+	public void updateValues(View view){
+		if (mSensorEvent != null){
+			MainActivity.textView.setText("X: "+ mSensorEvent.values[0] +
+					"\nY: "+ mSensorEvent.values[1] +
+					"\nX: "+ mSensorEvent.values[2]);
+		}
+		else{
+			MainActivity.textView.setText("Sensor is null");
+		}
 	}
 
 }

@@ -1,38 +1,99 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.cgii.humanblackboxandroid.MainActivity"
-    tools:ignore="MergeRootFrame" >
+    android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/debugTextView"
-        android:layout_width="wrap_content"
+   <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/placeholder"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.cgii.humanblackboxandroid.MainActivity"
+        tools:ignore="MergeRootFrame" >
 
-    <TextView
-        android:id="@+id/count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/debugTextView"
-        android:layout_below="@+id/debugTextView"
-        android:text="@string/placeholder" />
+        <TextView
+            android:id="@+id/About"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/about"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <TextView
+            android:id="@+id/infoAboutApp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/About"
+            android:layout_below="@+id/About"
+            android:layout_centerHorizontal="true"
+            android:text="@string/info_about_app" />
+        
+        <Button
+            android:id="@+id/stopServices"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/About"
+            android:layout_below="@+id/infoAboutApp"
+            android:onClick="stopServices"
+            android:text="@string/stop_services" />
+        
+        <Button
+            android:id="@+id/restartServices"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stopServices"
+            android:layout_alignLeft="@+id/About"
+            android:onClick="restartServices"
+            android:text="@string/restart_services" />
+        
+        <TextView
+            android:id="@+id/DEBUG"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/restartServices"
+            android:text="DEBUG"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            tools:ignore="HardcodedText" />
+        
+        <TextView
+            android:id="@+id/debugTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/DEBUG"
+            android:text="@string/placeholder"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <VideoView
-        android:id="@+id/videoView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/count"
-        android:layout_below="@+id/count"
-        android:layout_marginTop="28dp" />
-    
-</RelativeLayout>
+        <TextView
+            android:id="@+id/count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/debugTextView"
+            android:layout_below="@+id/debugTextView"
+            android:text="@string/placeholder" />
+
+        <Button
+            android:id="@+id/forceCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/count"
+            android:layout_alignParentLeft="true"
+            android:onClick="launchCamera"
+            android:text="Force Camera" />
+
+        <Button
+            android:id="@+id/forceUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/forceCamera"
+            android:layout_alignParentLeft="true"
+            android:onClick="updateValues"
+            android:text="Force Update" />
+        
+    </RelativeLayout>
+
+</ScrollView>
