@@ -195,14 +195,20 @@ public class MainActivity extends Activity {
 				"\nZ: "+ mSensorEvent.values[2]);
 	}
 	public void calledCamera(){
-		try{
-			Intent intent = new Intent(this, CameraServices.class);
-			startActivity(intent);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			Log.e(TAG, "An exception has occured.");
-		}
+//		try{
+//			Intent intent = new Intent(this, CameraServices.class);
+//			startActivity(intent);
+//		}
+//		catch(Exception e){
+//			e.printStackTrace();
+//			Log.e(TAG, "An exception has occured.");
+//		}
+		Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+		intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, recordingTimeInSeconds);
+		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+		startActivityForResult(intent, CameraServices.TAKE_VIDEO_REQUEST);
+		isRecording = false;
+		
 	}
 	
 }
