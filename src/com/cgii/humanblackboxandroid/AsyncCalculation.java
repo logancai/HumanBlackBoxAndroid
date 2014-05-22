@@ -5,6 +5,7 @@ import java.util.Date;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 
 
@@ -48,9 +49,11 @@ public class AsyncCalculation extends Thread{
 						String values = "Sensor is null";
 						Log.v(TAG, values);
 					}
-					while((now.getTime() - before.getTime()) < MainActivity.getDelay()){
-						now = new Date();
-					}
+					//Is there a more efficient way to wait?
+					SystemClock.sleep(MainActivity.getDelay());
+//					while((now.getTime() - before.getTime()) < MainActivity.getDelay()){
+//						now = new Date();
+//					}
 				}
 			}
 		}

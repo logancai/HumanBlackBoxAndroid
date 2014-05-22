@@ -63,6 +63,12 @@ public class MainActivity extends Activity {
 		//Begin Camera services
 		Log.v(MainActivity.TAG, "Main onCreate Called");
 		
+		/*
+		 * What is Handler?
+		 * Handler communicates between the async thread and this thread.
+		 * The thread is not allowed to directly touch the user interface
+		 * so we must use this if we are using a thread.
+		 */
 		mHandler = new Handler(){
 			public void handleMessage(Message msg){
 				boolean isRecording = msg.getData().getBoolean("RECORDING");
@@ -75,7 +81,6 @@ public class MainActivity extends Activity {
 				}
 			}
 		};
-		//helllow
 		Intent intent = new Intent(this, Services.class);
 		startService(intent);
 		
