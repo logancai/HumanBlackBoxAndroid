@@ -32,11 +32,12 @@ public class MainActivity extends Activity {
 	public static SensorServices mSensorServices;
 	public static SensorEvent mSensorEvent;
 	public static CameraServices mCameraServices;
+	public static Thread mAsyncCalculation;
 	
 	public final static int recordingTimeInSeconds = 15;
 	public final static long recordingTimeInMilSec = recordingTimeInSeconds * 1000;
 	public final static long REFRESH_RATE_FPS = 45;
-	public final static long DELAY = 5; //in milliseconds
+	public final static long DELAY = 1/45*1000; //in milliseconds
 	
     /** Layout stuff*/
     public static TextView textView = null;
@@ -129,6 +130,7 @@ public class MainActivity extends Activity {
 	
 	public void stopServices(View view){
 		mSensorServices.stop();
+		
 	}
 	public void restartServices(View view){
 		mSensorServices.stop();
@@ -149,6 +151,16 @@ public class MainActivity extends Activity {
 		else{
 			MainActivity.textView.setText("Sensor is null");
 		}
+	}
+	
+	public static void changeTextInTextView(String text){
+		MainActivity.textView.setText(text);
+	}
+	public static SensorEvent getSensorEvent(){
+		return mSensorEvent;
+	}
+	public static long getDelay(){
+		return DELAY;
 	}
 
 }

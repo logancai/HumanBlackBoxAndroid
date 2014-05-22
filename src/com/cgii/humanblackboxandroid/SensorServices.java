@@ -46,7 +46,8 @@ public class SensorServices implements SensorEventListener{
 		}
 		mTracking = true;
 		
-		new AsyncCalculation().execute();
+		MainActivity.mAsyncCalculation = new AsyncCalculation();
+		MainActivity.mAsyncCalculation.start();
 		
 	}
 	
@@ -54,7 +55,11 @@ public class SensorServices implements SensorEventListener{
 		if (mTracking) {
 			mSensorManager.unregisterListener(this);
 			mTracking = false;
+			MainActivity.mAsyncCalculation.interrupt();
 		}
+	}
+	public static boolean getTracking(){
+		return mTracking;
 	}
 	
 }
