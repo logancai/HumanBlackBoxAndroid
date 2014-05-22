@@ -24,11 +24,9 @@ public class SensorServices implements SensorEventListener{
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-			
 //			MainActivity.textView.setText("X: "+ event[0] +
 //					"\nY: "+ event[1] +
 //					"\nX: "+ event[2] +);
-			
 			MainActivity.mSensorEvent = event;
 		}
 	}

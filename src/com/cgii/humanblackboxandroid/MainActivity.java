@@ -16,6 +16,8 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     
@@ -33,6 +36,7 @@ public class MainActivity extends Activity {
 	public static SensorEvent mSensorEvent;
 	public static CameraServices mCameraServices;
 	public static Thread mAsyncCalculation;
+	public static Handler mHandler;
 	
 	public final static int recordingTimeInSeconds = 15;
 	public final static long recordingTimeInMilSec = recordingTimeInSeconds * 1000;
@@ -58,6 +62,15 @@ public class MainActivity extends Activity {
 		
 		//Begin Camera services
 		Log.v(MainActivity.TAG, "Main onCreate Called");
+		
+		mHandler = new Handler(){
+			public void handleMessage(Message msg){
+				boolean isRecording = msg.getData().getBoolean("RECORDING");
+				if(isRecording){
+					calledCamera();
+				}
+			}
+		};
 		
 		Intent intent = new Intent(this, Services.class);
 		startService(intent);
@@ -162,5 +175,18 @@ public class MainActivity extends Activity {
 	public static long getDelay(){
 		return DELAY;
 	}
-
+	public static Handler getHandler(){
+		return mHandler;
+	}
+	public void calledCamera(){
+		try{
+			Intent intent = new Intent(this, CameraServices.class);
+			startActivity(intent);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			Log.e(TAG, "An intent exception has occured.");
+		}
+	}
+	
 }
