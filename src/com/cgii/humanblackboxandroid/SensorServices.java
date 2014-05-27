@@ -8,7 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public class SensorServices implements SensorEventListener{
+public class SensorServices extends Services implements SensorEventListener{
 	
 	private final SensorManager mSensorManager;
 	

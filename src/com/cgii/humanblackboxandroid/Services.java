@@ -28,6 +28,11 @@ public class Services extends Service {
 		return START_STICKY;
     }
 	
+	@Override
+	public void onDestroy(){
+		MainActivity.mSensorServices.stop();
+		
+	}
 	
 	
 }
