@@ -26,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
     
@@ -43,6 +42,7 @@ public class MainActivity extends Activity {
 	public final static long recordingTimeInMilSec = recordingTimeInSeconds * 1000;
 	public final static long REFRESH_RATE_FPS = 45;
 	public final static long DELAY = 1/45*1000; //in milliseconds
+	public static final int TAKE_VIDEO_REQUEST = 1;
 	
     /** Layout stuff*/
     public static TextView textView = null;
@@ -200,20 +200,21 @@ public class MainActivity extends Activity {
 				"\nZ: "+ mSensorEvent.values[2]);
 	}
 	public void calledCamera(){
-//		try{
-//			Intent intent = new Intent(this, CameraServices.class);
-//			startActivity(intent);
-//		}
-//		catch(Exception e){
-//			e.printStackTrace();
-//			Log.e(TAG, "An exception has occured.");
-//		}
 		Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 		intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, recordingTimeInSeconds);
 		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 		startActivityForResult(intent, CameraServices.TAKE_VIDEO_REQUEST);
 		isRecording = false;
-		
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == TAKE_VIDEO_REQUEST && resultCode == RESULT_OK) {
+	        String picturePath = data.getStringExtra(
+	                CameraManager.EXTRA_PICTURE_FILE_PATH);
+	        Log.v(Services.TAG, "Path to vide is: " + picturePath);
+	        isRecording = false;
+	    }
 	}
 	
 }

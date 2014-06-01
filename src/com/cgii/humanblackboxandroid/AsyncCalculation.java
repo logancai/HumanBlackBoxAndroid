@@ -28,8 +28,6 @@ public class AsyncCalculation extends Thread{
 					before = new Date();
 					now = new Date();
 					if (MainActivity.getSensorEvent() != null){
-//						String values = "Sensor is not null";
-//						Log.v(TAG, values);
 						
 						//Math formula goes here
 						//Please call beginRecording(); and MainActivity.setRecodringStatus(true);
