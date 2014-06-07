@@ -51,13 +51,59 @@
             android:text="@string/restart_services" />
         
         <TextView
+            android:id="@+id/currentLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/About"
+            android:layout_below="@+id/restartServices"
+            android:text="@string/current_location"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        
+        <TextView
+            android:id="@+id/currentAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/About"
+            android:layout_below="@+id/currentLocation"
+            android:text="@string/current_address"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <Button
+            android:id="@+id/sendLocation"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/currentAddress"
+            android:layout_below="@+id/currentAddress"
+            android:onClick="sendAddressMsg"
+            android:text="@string/send_sms" />
+        
+        <TextView
+            android:id="@+id/phoneText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/About"
+            android:layout_below="@+id/sendLocation"
+            android:text="@string/sms_phone"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <EditText
+            android:id="@+id/phoneNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/About"
+            android:layout_below="@+id/phoneText"
+            android:ems="10"
+            android:inputType="phone" />
+        
+        <TextView
             android:id="@+id/DEBUG"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/restartServices"
+            android:layout_below="@+id/phoneNumber"
             android:text="DEBUG"
             android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="invisible"
             tools:ignore="HardcodedText" />
         
         <TextView
@@ -66,7 +112,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/DEBUG"
             android:text="@string/placeholder"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/forceCamera"
@@ -75,16 +122,24 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/debugTextView"
             android:onClick="launchCamera"
-            android:text="Force Camera" />
+            android:text="Force Camera"
+            android:visibility="invisible"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/forceUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/forceCamera"
             android:layout_alignParentLeft="true"
+            android:layout_below="@+id/forceCamera"
             android:onClick="updateValues"
-            android:text="Force Update" />
+            android:text="Force Update"
+            android:visibility="invisible"
+            tools:ignore="HardcodedText" />
+
+            <requestFocus
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         
     </RelativeLayout>
 

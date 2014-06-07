@@ -30,8 +30,8 @@ public class AsyncCalculation extends Thread{
 					if (MainActivity.getSensorEvent() != null){
 						
 						//Math formula goes here
-						//Please call beginRecording(); and MainActivity.setRecodringStatus(true);
-						//when ready to record
+						//Our true math formula is in the Google Glass version
+						//But this is sufficient for testing
 						SensorEvent event = MainActivity.getSensorEvent();
 						double vector = Math.sqrt(event.values[0]*event.values[0]+
 								event.values[1]*event.values[1]+
@@ -49,9 +49,6 @@ public class AsyncCalculation extends Thread{
 					}
 					//Is there a more efficient way to wait?
 					SystemClock.sleep(MainActivity.getDelay());
-//					while((now.getTime() - before.getTime()) < MainActivity.getDelay()){
-//						now = new Date();
-//					}
 				}
 			}
 		}

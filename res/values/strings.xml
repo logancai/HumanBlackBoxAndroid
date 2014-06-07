@@ -14,5 +14,9 @@
     <string name="stop_services">Stop Background Services</string>
     <string name="restart_services">Restart Services</string>
     <string name="test">test</string>
+    <string name="current_location">Current location</string>
+    <string name="current_address">No address yet..</string>
+    <string name="send_sms">Send Text Message With Location</string>
+    <string name="sms_phone">SMS Phone number</string>
 
 </resources>
